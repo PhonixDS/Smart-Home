@@ -3,55 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Secure Smart Home Control</title>
+  <title>Smart Home Control</title>
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: #f5f5f5;
-      margin: 0;
-      padding: 20px;
+      padding: 10px;
     }
-    h1, h2 {
+    h1 {
       text-align: center;
-      color: #333;
+      color: #222;
     }
-    #login-section {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    #passwordInput {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    #login-section button {
-      width: 100%;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-    #main-ui {
-      display: none;
-    }
+
     .grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 16px;
+      padding: 10px;
     }
+
     .device {
       background: #fff;
       border-radius: 12px;
@@ -62,12 +38,24 @@
       min-width: 220px;
       text-align: center;
     }
+
+    .device h2 {
+      margin-top: 0;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
     .btn-group {
       display: flex;
       justify-content: space-around;
       margin-top: 10px;
     }
-    button.control {
+
+    button {
       flex: 1;
       margin: 0 5px;
       padding: 10px;
@@ -77,63 +65,63 @@
       cursor: pointer;
       color: white;
     }
-    .on-btn { background-color: #4CAF50; }
-    .off-btn { background-color: #f44336; }
-    .status {
-      margin-top: 10px;
-      font-weight: bold;
-      font-size: 16px;
+
+    .on-btn {
+      background-color: #4CAF50;
     }
-    .status.ON { color: green; }
-    .status.OFF { color: red; }
+
+    .off-btn {
+      background-color: #f44336;
+    }
+
+    @media (max-width: 500px) {
+      .btn-group {
+        flex-direction: column;
+      }
+      button {
+        margin: 5px 0;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="login-section">
-    <h2>Login</h2>
-    <input type="password" id="passwordInput" placeholder="Enter password" />
-    <button onclick="checkPassword()">Login</button>
-    <p id="login-status" style="color:red;"></p>
-  </div>
 
-  <div id="main-ui">
-    <h1>Smart Home Control</h1>
-    <div class="grid">
-      <div class="device" id="light1">
-        <h2>Light 1</h2>
-        <div class="btn-group">
-          <button class="control on-btn" onclick="sendCommand('light1', 'ON')">ON</button>
-          <button class="control off-btn" onclick="sendCommand('light1', 'OFF')">OFF</button>
-        </div>
-        <div class="status" id="status-light1">Status: --</div>
+  <h1>Smart Home Control</h1>
+  <div class="grid">
+    <div class="device" id="light1">
+      <h2>Light 1</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('light1', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('light1', 'OFF')">OFF</button>
       </div>
+      <div class="status" id="status-light1">Status: --</div>
+    </div>
 
-      <div class="device" id="light2">
-        <h2>Light 2</h2>
-        <div class="btn-group">
-          <button class="control on-btn" onclick="sendCommand('light2', 'ON')">ON</button>
-          <button class="control off-btn" onclick="sendCommand('light2', 'OFF')">OFF</button>
-        </div>
-        <div class="status" id="status-light2">Status: --</div>
+    <div class="device" id="light2">
+      <h2>Light 2</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('light2', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('light2', 'OFF')">OFF</button>
       </div>
+      <div class="status" id="status-light2">Status: --</div>
+    </div>
 
-      <div class="device" id="light3">
-        <h2>Light 3</h2>
-        <div class="btn-group">
-          <button class="control on-btn" onclick="sendCommand('light3', 'ON')">ON</button>
-          <button class="control off-btn" onclick="sendCommand('light3', 'OFF')">OFF</button>
-        </div>
-        <div class="status" id="status-light3">Status: --</div>
+    <div class="device" id="light3">
+      <h2>Light 3</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('light3', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('light3', 'OFF')">OFF</button>
       </div>
+      <div class="status" id="status-light3">Status: --</div>
+    </div>
 
-      <div class="device" id="fan1">
-        <h2>Fan</h2>
-        <div class="btn-group">
-          <button class="control on-btn" onclick="sendCommand('fan1', 'ON')">ON</button>
-          <button class="control off-btn" onclick="sendCommand('fan1', 'OFF')">OFF</button>
-        </div>
-        <div class="status" id="status-fan1">Status: --</div>
+    <div class="device" id="fan1">
+      <h2>Fan</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('fan1', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('fan1', 'OFF')">OFF</button>
       </div>
+      <div class="status" id="status-fan1">Status: --</div>
     </div>
   </div>
 
@@ -141,39 +129,25 @@
     const broker = 'wss://broker.hivemq.com:8884/mqtt';
     const client = mqtt.connect(broker);
 
-    function checkPassword() {
-      const pwd = document.getElementById("passwordInput").value;
-      client.publish("home/login", pwd);
-    }
+    client.on('connect', () => {
+      console.log('Connected to MQTT broker');
+      ['light1', 'light2', 'light3', 'fan1'].forEach(device => {
+        client.subscribe(`home/${device}/status`);
+      });
+    });
+
+    client.on('message', (topic, message) => {
+      const parts = topic.split('/');
+      const device = parts[1];
+      const status = message.toString();
+      document.getElementById(`status-${device}`).textContent = `Status: ${status}`;
+    });
 
     function sendCommand(device, state) {
       const topic = `home/${device}/command`;
       client.publish(topic, state);
     }
-
-    client.on("connect", () => {
-      client.subscribe("home/login/status");
-      ["light1", "light2", "light3", "fan1"].forEach(device => {
-        client.subscribe(`home/${device}/status`);
-      });
-    });
-
-    client.on("message", (topic, message) => {
-      const msg = message.toString();
-      if (topic === "home/login/status") {
-        if (msg === "success") {
-          document.getElementById("login-section").style.display = "none";
-          document.getElementById("main-ui").style.display = "block";
-        } else {
-          document.getElementById("login-status").textContent = "Incorrect password!";
-        }
-      } else if (topic.includes("/status")) {
-        const device = topic.split("/")[1];
-        const statusDiv = document.getElementById(`status-${device}`);
-        statusDiv.textContent = `Status: ${msg}`;
-        statusDiv.className = `status ${msg}`;
-      }
-    });
   </script>
+
 </body>
 </html>
