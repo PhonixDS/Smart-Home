@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Home Control</title>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      padding: 10px;
+    }
+    h1 {
+      text-align: center;
+      color: #222;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      padding: 10px;
+    }
+
+    .device {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 16px;
+      flex: 1 1 250px;
+      max-width: 300px;
+      min-width: 220px;
+      text-align: center;
+    }
+
+    .device h2 {
+      margin-top: 0;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    button {
+      flex: 1;
+      margin: 0 5px;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .on-btn {
+      background-color: #4CAF50;
+    }
+
+    .off-btn {
+      background-color: #f44336;
+    }
+
+    @media (max-width: 500px) {
+      .btn-group {
+        flex-direction: column;
+      }
+      button {
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Smart Home Control</h1>
+  <div class="grid">
+    <div class="device" id="light1">
+      <h2>Light 1</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('light1', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('light1', 'OFF')">OFF</button>
+      </div>
+      <div class="status" id="status-light1">Status: --</div>
+    </div>
+
+    <div class="device" id="light2">
+      <h2>Light 2</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('light2', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('light2', 'OFF')">OFF</button>
+      </div>
+      <div class="status" id="status-light2">Status: --</div>
+    </div>
+
+    <div class="device" id="light3">
+      <h2>Light 3</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('light3', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('light3', 'OFF')">OFF</button>
+      </div>
+      <div class="status" id="status-light3">Status: --</div>
+    </div>
+
+    <div class="device" id="fan1">
+      <h2>Fan</h2>
+      <div class="btn-group">
+        <button class="on-btn" onclick="sendCommand('fan1', 'ON')">ON</button>
+        <button class="off-btn" onclick="sendCommand('fan1', 'OFF')">OFF</button>
+      </div>
+      <div class="status" id="status-fan1">Status: --</div>
+    </div>
+  </div>
+
+  <script>
+    const broker = 'wss://broker.hivemq.com:8884/mqtt';
+    const client = mqtt.connect(broker);
+
+    client.on('connect', () => {
+      console.log('Connected to MQTT broker');
+      ['light1', 'light2', 'light3', 'fan1'].forEach(device => {
+        client.subscribe(`home/${device}/status`);
+      });
+    });
+
+    client.on('message', (topic, message) => {
+      const parts = topic.split('/');
+      const device = parts[1];
+      const status = message.toString();
+      document.getElementById(`status-${device}`).textContent = `Status: ${status}`;
+    });
+
+    function sendCommand(device, state) {
+      const topic = `home/${device}/command`;
+      client.publish(topic, state);
+    }
+  </script>
+
+</body>
+</html>
